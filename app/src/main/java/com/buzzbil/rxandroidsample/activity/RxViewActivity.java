@@ -11,12 +11,15 @@ import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxCompoundButton;
 
 import io.reactivex.Observable;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Predicate;
 
 public class RxViewActivity extends AppCompatActivity {
+
+    CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,13 +28,11 @@ public class RxViewActivity extends AppCompatActivity {
 
         Button button = findViewById(R.id.rx_view_btn);
         Observable<Object> clickObs = RxView.clicks(button);
-
-
         CheckBox checkBox = findViewById(R.id.rx_view_checkbox);
         Observable<Boolean> checkedTrueObs = RxCompoundButton.checkedChanges(checkBox)
                 .skipInitialValue();
 
-        Disposable subscribe = clickObs
+        Disposable disposable = clickObs
                 // 클릭 스트림에 체크 스트림의 마지막 값을 조합해서 새로운 스트림을 만든다.
                 .withLatestFrom(checkedTrueObs, new BiFunction<Object, Boolean, Boolean>() {
                     @Override
@@ -54,5 +55,13 @@ public class RxViewActivity extends AppCompatActivity {
                         Toast.makeText(RxViewActivity.this, "result : " + o, Toast.LENGTH_SHORT).show();
                     }
                 });
+
+        compositeDisposable.add(disposable);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        compositeDisposable.clear();
     }
 }

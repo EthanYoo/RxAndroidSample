@@ -17,6 +17,7 @@ class RxViewKtActivity : AppCompatActivity() {
         setContentView(R.layout.activity_rx_view)
 
         val clicks = RxView.clicks(find(R.id.rx_view_btn))
+
         val checkedChanges = RxCompoundButton.checkedChanges(find(R.id.rx_view_checkbox))
 
         clicks
